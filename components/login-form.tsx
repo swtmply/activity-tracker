@@ -1,9 +1,12 @@
+"use client";
+
 import { GalleryVerticalEnd } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { signInWithGithub } from "@/lib/auth-client";
 
 export function LoginForm({
   className,
@@ -40,7 +43,12 @@ export function LoginForm({
             </span>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Button variant="outline" className="w-full">
+            <Button
+              onClick={signInWithGithub}
+              type="button"
+              variant="outline"
+              className="w-full"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96">
                 <path
                   fillRule="evenodd"
