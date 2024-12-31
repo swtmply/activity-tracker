@@ -24,7 +24,6 @@ export const activity = sqliteTable("activity", {
 export const activitySelectSchema = createSelectSchema(activity);
 export const activityInsertSchema = createInsertSchema(activity, {
   id: z.string().optional(),
-  userId: z.string().optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });

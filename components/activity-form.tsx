@@ -47,10 +47,12 @@ const defaultValues = {
 };
 export default function ActivityForm() {
   const { data: session } = authClient.useSession();
+
   const form = useForm({
     resolver: zodResolver(activityInsertSchema),
     defaultValues: {
       ...defaultValues,
+      userId: "user_id_placeholder",
     },
   });
   const [newItem, setNewItem] = React.useState("");
