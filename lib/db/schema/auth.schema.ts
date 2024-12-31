@@ -1,4 +1,6 @@
+import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { activity } from "./activity.schema";
 
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
@@ -9,6 +11,10 @@ export const user = sqliteTable("user", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
+
+export const userRelations = relations(user, ({ many }) => ({
+  activities: many(activity),
+}));
 
 export const session = sqliteTable("session", {
   id: text("id").primaryKey(),
