@@ -1,18 +1,35 @@
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { user } from "./auth.schema";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
+import { createSelectSchema, createInsertSchema } from "drizzle-zod";
+import { z } from "zod";
+import cuid from "cuid";
 
 export const activity = sqliteTable("activity", {
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().default(cuid()),
   userId: text("user_id")
     .notNull()
     .references(() => user.id),
   name: text("name").notNull(),
   items: text("items", { mode: "json" }).notNull(),
   color: text("color").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
+
+export const activitySelectSchema = createSelectSchema(activity);
+export const activityInsertSchema = createInsertSchema(activity, {
+  id: z.string().optional(),
+  userId: z.string().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+export type Activity = z.infer<typeof activitySelectSchema>;
+export type ActivityInsert = z.infer<typeof activityInsertSchema>;
 
 export const activityRelations = relations(activity, ({ one, many }) => ({
   user: one(user, {
@@ -23,15 +40,25 @@ export const activityRelations = relations(activity, ({ one, many }) => ({
 }));
 
 export const activityEntry = sqliteTable("activity_entry", {
-  id: text("id").primaryKey(),
+  id: text("id").primaryKey().default(cuid()),
   activityId: text("activity_id")
     .notNull()
     .references(() => activity.id),
   metric: integer("metric").notNull(),
   date: integer("date", { mode: "timestamp" }).notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
 });
+
+export const activityEntrySelectSchema = createSelectSchema(activityEntry);
+export const activityEntryInsertSchema = createInsertSchema(activityEntry);
+
+export type ActivityEntry = z.infer<typeof activityEntrySelectSchema>;
+export type ActivityEntryInsert = z.infer<typeof activityEntryInsertSchema>;
 
 export const activityEntryRelations = relations(activityEntry, ({ one }) => ({
   activity: one(activity, {
@@ -39,3 +66,5 @@ export const activityEntryRelations = relations(activityEntry, ({ one }) => ({
     references: [activity.id],
   }),
 }));
+
+export type ActivityWithEntries = Activity & { entries: ActivityEntry[] };

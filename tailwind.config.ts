@@ -10,7 +10,7 @@ const config: Config = {
   safelist: [
     {
       pattern:
-        /^bg-(red|green|yellow|orange|teal|blue|purple)-(100|200|300|400|500)/,
+        /^bg-(red|green|yellow|orange|teal|blue|purple|gray)-(100|200|300|400|500)/,
     },
   ],
   theme: {

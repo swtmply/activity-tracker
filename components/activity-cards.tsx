@@ -5,47 +5,46 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  cn,
-  generateRandomColor,
-  generateRandomData,
-  getColor,
-} from "@/lib/utils";
+import { getActivities } from "@/lib/actions/activity.actions";
+import { auth } from "@/lib/auth";
+import { cn, generateRandomData, getColor } from "@/lib/utils";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-const data = {
-  activities: [
-    {
-      name: "Jogging",
-      data: generateRandomData(31),
-    },
-    {
-      name: "Reading",
-      data: generateRandomData(31),
-    },
-    {
-      name: "Coding",
-      data: generateRandomData(31),
-    },
-    {
-      name: "Drawing",
-      data: generateRandomData(31),
-    },
-  ],
-};
+export default async function ActivityCards() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-export default function ActivityCards() {
+  if (!session) {
+    redirect("/login");
+  }
+
+  const activities = await getActivities(session.user.id);
+
   return (
     <div className="grid grid-cols-3 gap-1">
-      {data.activities.map((activity, index) => (
-        <ActivityCard key={index} name={activity.name} data={activity.data} />
+      {activities.map((activity, index) => (
+        <ActivityCard
+          key={index}
+          name={activity.name}
+          data={generateRandomData(31)}
+          color={activity.color}
+        />
       ))}
     </div>
   );
 }
 
-export function ActivityCard({ name, data }: { name: string; data: number[] }) {
-  const color = generateRandomColor();
-
+export function ActivityCard({
+  name,
+  data,
+  color,
+}: {
+  name: string;
+  data: number[];
+  color: string;
+}) {
   return (
     <Card>
       <CardHeader>

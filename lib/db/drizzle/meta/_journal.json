@@ -8,6 +8,13 @@
       "when": 1735626520184,
       "tag": "0000_faulty_songbird",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1735631189604,
+      "tag": "0001_common_beast",
+      "breakpoints": true
     }
   ]
 }

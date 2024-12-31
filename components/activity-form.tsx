@@ -19,23 +19,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { toast } from "@/hooks/use-toast";
+import { createActivity } from "@/lib/actions/activity.actions";
+import { authClient } from "@/lib/auth-client";
+import { activityInsertSchema } from "@/lib/db/schema/activity.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
-import * as z from "zod";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
-import { toast } from "@/hooks/use-toast";
-
-const schema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  color: z.string(),
-  items: z
-    .array(z.string())
-    .min(1, { message: "At least one item is required" })
-    .max(5, { message: "Maximum of 5 items" }),
-});
 
 const tailwindColors = [
   "red",
@@ -52,14 +45,16 @@ const defaultValues = {
   color: tailwindColors[0],
   items: [] as string[],
 };
-
 export default function ActivityForm() {
+  const { data: session } = authClient.useSession();
   const form = useForm({
-    resolver: zodResolver(schema),
-    defaultValues,
+    resolver: zodResolver(activityInsertSchema),
+    defaultValues: {
+      ...defaultValues,
+    },
   });
-
   const [newItem, setNewItem] = React.useState("");
+  const [open, setOpen] = React.useState(false);
 
   const selectedColor = form.getValues("color");
 
@@ -79,19 +74,46 @@ export default function ActivityForm() {
     form.setValue("items", items);
   };
 
-  const onSubmit = (data: { name: string; color: string; items: string[] }) => {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const onSubmit = async (data: {
+    name: string;
+    color: string;
+    items: string[];
+  }) => {
+    if (!session) {
+      return toast({
+        title: "Error",
+        description: "You must be logged in to create an activity.",
+      });
+    }
+
+    try {
+      await createActivity({
+        ...data,
+        userId: session.user.id,
+      });
+
+      toast({
+        title: "You submitted the following values:",
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
+      });
+
+      setOpen(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return toast({
+          title: "Something went wrong",
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant={"outline"}>
           <Plus />
