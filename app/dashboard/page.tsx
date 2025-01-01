@@ -1,6 +1,4 @@
 import ActivityCards from "@/components/activity-cards";
-import ActivityForm from "@/components/activity-form";
-import ActivityEntryForm from "@/components/activity-entry-form";
 import { SidebarLeft } from "@/components/sidebar-left";
 import {
   Breadcrumb,
@@ -15,11 +13,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+import DateFilter from "@/components/date-filter";
+import FormDialog from "@/components/form-dialog";
 import { getActivities } from "@/lib/actions/activity.actions";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import DateFilter from "@/components/date-filter";
 
 export default async function Page({
   searchParams,
@@ -71,10 +70,7 @@ export default async function Page({
               <DateFilter month={m} year={y} />
             </div>
 
-            <div className="flex gap-1">
-              <ActivityForm />
-              <ActivityEntryForm activities={activities} />
-            </div>
+            <FormDialog activities={activities} />
           </div>
           <ActivityCards activities={activities} />
         </main>

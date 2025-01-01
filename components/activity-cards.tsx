@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -5,24 +7,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Activity } from "@/lib/db/schema/activity.schema";
-import { cn, generateRandomData, getColor } from "@/lib/utils";
+import { ActivityWithEntries } from "@/lib/db/schema/activity.schema";
+import { cn, generateData, getColor, months } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
-export default async function ActivityCards({
+export default function ActivityCards({
   activities,
 }: {
-  activities: Activity[];
+  activities: ActivityWithEntries[];
 }) {
+  const searchParams = useSearchParams();
+  const month = searchParams.get("m");
+  const year = searchParams.get("y");
+  const days = new Date(
+    parseInt(year || new Date().getFullYear().toString()),
+    parseInt(month || new Date().getMonth().toString()) + 1,
+    0
+  ).getDate();
+
   return (
     <div className="grid grid-cols-3 gap-1">
-      {activities.map((activity, index) => (
-        <ActivityCard
-          key={index}
-          name={activity.name}
-          data={generateRandomData(31)}
-          color={activity.color}
-        />
-      ))}
+      {activities.map((activity, index) => {
+        const fills = generateData(days);
+        const data = fills.map((_, index) => {
+          const entry = activity.entries.find((entry) => entry.day === index);
+
+          return entry ? entry.metric : 0;
+        });
+
+        return (
+          <ActivityCard
+            key={index}
+            name={activity.name}
+            data={data}
+            color={activity.color}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -36,11 +57,19 @@ export function ActivityCard({
   data: number[];
   color: string;
 }) {
+  const searchParams = useSearchParams();
+  const m = searchParams.get("m");
+  const currentMonth = months.find(
+    (month) => month.value === parseInt(m || new Date().getMonth().toString())
+  )?.label;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>{name}</CardTitle>
-        <CardDescription>Month of December</CardDescription>
+        <CardDescription>
+          <span className="capitalize">{currentMonth} Summary</span>
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-7 gap-1">

@@ -42,10 +42,10 @@ export async function getActivities(
 ): Promise<Activity[] | ActivityWithEntries[]> {
   try {
     if (options) {
-      const startDate = new Date(new Date().getFullYear(), options.month, 1);
-      const endDate = new Date(new Date().getFullYear(), options.month + 1, 0);
+      const startDate = new Date(options.year, options.month, 1);
+      const endDate = new Date(options.year, options.month + 1, 0);
 
-      return (await db.query.activity.findMany({
+      const response = (await db.query.activity.findMany({
         where: and(eq(activity.userId, userId)),
         with: {
           entries: {
@@ -56,6 +56,25 @@ export async function getActivities(
           },
         },
       })) as ActivityWithEntries[];
+
+      const data = response.map((activity) => {
+        const entries = activity.entries.map((entry) => {
+          return {
+            ...entry,
+            year: entry.date.getFullYear(),
+            month: entry.date.getMonth(),
+            day: entry.date.getDate() - 1,
+            metric: entry.metric,
+          };
+        });
+
+        return {
+          ...activity,
+          entries: entries,
+        };
+      });
+
+      return data;
     }
 
     return (await db

@@ -1,4 +1,3 @@
-import ActivityForm from "@/components/activity-form";
 import { SidebarLeft } from "@/components/sidebar-left";
 import {
   Breadcrumb,
@@ -14,9 +13,8 @@ import {
 } from "@/components/ui/sidebar";
 
 import DateFilter from "@/components/date-filter";
-import { Button } from "@/components/ui/button";
+import FormDialog from "@/components/form-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus } from "lucide-react";
 
 export default async function Loading() {
   return (
@@ -46,13 +44,7 @@ export default async function Loading() {
               <DateFilter month="0" year="0" />
             </div>
 
-            <div className="flex gap-1">
-              <ActivityForm />
-              <Button>
-                <Plus />
-                Add Data Entry
-              </Button>
-            </div>
+            <FormDialog activities={[]} />
           </div>
 
           <div className="grid grid-cols-3 gap-1">

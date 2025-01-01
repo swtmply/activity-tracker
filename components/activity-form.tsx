@@ -1,14 +1,5 @@
 "use client";
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import React from "react";
 
 import {
@@ -24,7 +15,7 @@ import { createActivity } from "@/lib/actions/activity.actions";
 import { authClient } from "@/lib/auth-client";
 import { activityInsertSchema } from "@/lib/db/schema/activity.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "./ui/form";
@@ -45,7 +36,11 @@ const defaultValues = {
   color: tailwindColors[0],
   items: [] as string[],
 };
-export default function ActivityForm() {
+export default function ActivityForm({
+  closeDialog,
+}: {
+  closeDialog: () => void;
+}) {
   const { data: session } = authClient.useSession();
 
   const form = useForm({
@@ -56,7 +51,6 @@ export default function ActivityForm() {
     },
   });
   const [newItem, setNewItem] = React.useState("");
-  const [open, setOpen] = React.useState(false);
 
   const selectedColor = form.getValues("color");
 
@@ -103,7 +97,7 @@ export default function ActivityForm() {
         ),
       });
 
-      setOpen(false);
+      closeDialog();
     } catch (error: unknown) {
       if (error instanceof Error) {
         return toast({
@@ -115,30 +109,62 @@ export default function ActivityForm() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant={"outline"}>
-          <Plus />
-          Add Activity
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create an Activity</DialogTitle>
-          <DialogDescription>
-            Fill out the necessary information to create an activity.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <Controller
+          name="name"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter name" {...field} />
+              </FormControl>
+              {fieldState.error && (
+                <FormMessage>{fieldState.error.message}</FormMessage>
+              )}
+            </FormItem>
+          )}
+        />
+
+        <div className="flex flex-col gap-4">
+          <FormLabel>Metrics</FormLabel>
+          <div className="grid grid-cols-2 gap-2">
+            <Input
+              placeholder="Enter metric (max 5 items)"
+              value={newItem}
+              onChange={(e) => setNewItem(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+
             <Controller
-              name="name"
+              name="color"
               control={form.control}
               render={({ field, fieldState }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter name" {...field} />
+                    <Select
+                      value={field.value}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                      }}
+                    >
+                      <SelectTrigger className="capitalize">
+                        <SelectValue placeholder="Select a color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {tailwindColors.map((color) => (
+                          <SelectItem
+                            key={color}
+                            value={color}
+                            className="capitalize"
+                            withColor
+                          >
+                            {color}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   {fieldState.error && (
                     <FormMessage>{fieldState.error.message}</FormMessage>
@@ -146,103 +172,51 @@ export default function ActivityForm() {
                 </FormItem>
               )}
             />
+          </div>
 
-            <div className="flex flex-col gap-4">
-              <FormLabel>Metrics</FormLabel>
-              <div className="grid grid-cols-2 gap-2">
-                <Input
-                  placeholder="Enter metric (max 5 items)"
-                  value={newItem}
-                  onChange={(e) => setNewItem(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
+          {form.formState.errors && (
+            <FormMessage>{form.formState.errors.items?.message}</FormMessage>
+          )}
+        </div>
 
-                <Controller
-                  name="color"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                          }}
-                        >
-                          <SelectTrigger className="capitalize">
-                            <SelectValue placeholder="Select a color" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {tailwindColors.map((color) => (
-                              <SelectItem
-                                key={color}
-                                value={color}
-                                className="capitalize"
-                                withColor
-                              >
-                                {color}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      {fieldState.error && (
-                        <FormMessage>{fieldState.error.message}</FormMessage>
-                      )}
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {form.formState.errors && (
-                <FormMessage>
-                  {form.formState.errors.items?.message}
-                </FormMessage>
-              )}
-            </div>
-
-            <Controller
-              name="items"
-              control={form.control}
-              render={({ field }) => (
-                <div className="grid grid-cols-2 gap-4">
-                  {field.value.map((item, index) => (
+        <Controller
+          name="items"
+          control={form.control}
+          render={({ field }) => (
+            <div className="grid grid-cols-2 gap-4">
+              {field.value.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center max-w-[10vw] justify-between"
+                >
+                  <div className="flex gap-2 items-center">
                     <div
-                      key={index}
-                      className="flex items-center max-w-[10vw] justify-between"
-                    >
-                      <div className="flex gap-2 items-center">
-                        <div
-                          className={`w-4 h-4 bg-${selectedColor}-${
-                            (index + 1) * 100
-                          } mr-2 rounded-lg`}
-                        ></div>
-                        <span className="line-clamp-1 text-sm">{item}</span>
-                      </div>
-                      <Button
-                        onClick={() => removeItem(index)}
-                        variant={"secondary"}
-                        size={"icon"}
-                        className="hover:text-red-500 hover:bg-red-100 rounded-full"
-                      >
-                        <Trash />
-                      </Button>
-                    </div>
-                  ))}
+                      className={`w-4 h-4 bg-${selectedColor}-${
+                        (index + 1) * 100
+                      } mr-2 rounded-lg`}
+                    ></div>
+                    <span className="line-clamp-1 text-sm">{item}</span>
+                  </div>
+                  <Button
+                    onClick={() => removeItem(index)}
+                    variant={"secondary"}
+                    size={"icon"}
+                    className="hover:text-red-500 hover:bg-red-100 rounded-full"
+                  >
+                    <Trash />
+                  </Button>
                 </div>
-              )}
-            />
-            <div className="grid grid-cols-2 gap-2">
-              <DialogClose asChild>
-                <Button type="button" variant={"secondary"}>
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button type="submit">Submit</Button>
+              ))}
             </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          )}
+        />
+        <div className="grid grid-cols-2 gap-2">
+          <Button onClick={closeDialog} type="button" variant={"secondary"}>
+            Cancel
+          </Button>
+          <Button type="submit">Submit</Button>
+        </div>
+      </form>
+    </Form>
   );
 }

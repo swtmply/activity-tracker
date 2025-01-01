@@ -55,7 +55,14 @@ export const activityEntry = sqliteTable("activity_entry", {
     .default(sql`(unixepoch())`),
 });
 
-export const activityEntrySelectSchema = createSelectSchema(activityEntry);
+export const activityEntrySelectSchema = createSelectSchema(
+  activityEntry
+).extend({
+  year: z.number(),
+  month: z.number(),
+  day: z.number(),
+});
+
 export const activityEntryInsertSchema = createInsertSchema(activityEntry, {
   id: z.string().optional(),
   metric: z.coerce.number(),
