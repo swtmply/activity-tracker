@@ -1,6 +1,6 @@
 import ActivityCards from "@/components/activity-cards";
 import ActivityForm from "@/components/activity-form";
-import DataEntryForm from "@/components/data-entry-form";
+import ActivityEntryForm from "@/components/activity-entry-form";
 import { SidebarLeft } from "@/components/sidebar-left";
 import {
   Breadcrumb,
@@ -15,7 +15,22 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-export default function Page() {
+import { getActivities } from "@/lib/actions/activity.actions";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+
+export default async function Page() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const activities = await getActivities(session.user.id);
+
   return (
     <SidebarProvider>
       <SidebarLeft />
@@ -44,10 +59,10 @@ export default function Page() {
 
             <div className="flex gap-1">
               <ActivityForm />
-              <DataEntryForm />
+              <ActivityEntryForm activities={activities} />
             </div>
           </div>
-          <ActivityCards />
+          <ActivityCards activities={activities} />
         </main>
       </SidebarInset>
     </SidebarProvider>

@@ -21,7 +21,9 @@ export const activity = sqliteTable("activity", {
     .default(sql`(unixepoch())`),
 });
 
-export const activitySelectSchema = createSelectSchema(activity);
+export const activitySelectSchema = createSelectSchema(activity, {
+  items: z.string().array(),
+});
 export const activityInsertSchema = createInsertSchema(activity, {
   id: z.string().optional(),
   createdAt: z.date().optional(),
@@ -54,7 +56,12 @@ export const activityEntry = sqliteTable("activity_entry", {
 });
 
 export const activityEntrySelectSchema = createSelectSchema(activityEntry);
-export const activityEntryInsertSchema = createInsertSchema(activityEntry);
+export const activityEntryInsertSchema = createInsertSchema(activityEntry, {
+  id: z.string().optional(),
+  metric: z.coerce.number(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
 
 export type ActivityEntry = z.infer<typeof activityEntrySelectSchema>;
 export type ActivityEntryInsert = z.infer<typeof activityEntryInsertSchema>;

@@ -2,7 +2,11 @@
 
 import { eq } from "drizzle-orm";
 import { db } from "../db";
-import { activity, ActivityInsert } from "../db/schema/activity.schema";
+import {
+  Activity,
+  activity,
+  ActivityInsert,
+} from "../db/schema/activity.schema";
 import { revalidatePath } from "next/cache";
 
 export const createActivity = async (data: ActivityInsert) => {
@@ -15,9 +19,12 @@ export const createActivity = async (data: ActivityInsert) => {
   }
 };
 
-export const getActivities = async (userId: string) => {
+export const getActivities = async (userId: string): Promise<Activity[]> => {
   try {
-    return await db.select().from(activity).where(eq(activity.userId, userId));
+    return (await db
+      .select()
+      .from(activity)
+      .where(eq(activity.userId, userId))) as Activity[];
   } catch (error) {
     throw Error(`Error getting activities: ${error}`);
   }

@@ -1,70 +1,106 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
-import { Button } from "./ui/button";
-import { CalendarIcon, Plus } from "lucide-react";
-import { useForm, Controller } from "react-hook-form";
+import { toast } from "@/hooks/use-toast";
+import { Activity } from "@/lib/db/schema/activity.schema";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PopoverClose } from "@radix-ui/react-popover";
+import { format } from "date-fns";
+import { CalendarIcon, Plus } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
+import { DatePickerDay } from "./date-picker";
+import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "./ui/select";
-import { Popover, PopoverTrigger, PopoverContent } from "./ui/popover";
-import { Calendar } from "./ui/calendar";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { DatePickerDay } from "./date-picker";
-import { PopoverClose } from "@radix-ui/react-popover";
-import { toast } from "@/hooks/use-toast";
+import { createActivityEntry } from "@/lib/actions/activity-entry.action";
 
 const schema = z.object({
   activity: z.string().min(1, { message: "Activity is required" }),
-  metric: z.string().min(1, { message: "Metric is required" }),
+  metric: z.coerce.number().min(1, { message: "Metric is required" }),
   date: z.date({ required_error: "Date is required" }),
 });
 
-const defaultValues = {
-  activity: "",
-  metric: "",
-  date: new Date(),
+type ActivityEntryFormProps = {
+  activities: Activity[];
 };
 
-const activities = ["Running", "Cycling", "Swimming"];
-const metrics = ["Distance", "Time", "Calories"];
-
-export default function DataEntryForm() {
+export default function ActivityEntryForm({
+  activities,
+}: ActivityEntryFormProps) {
   const form = useForm({
     resolver: zodResolver(schema),
-    defaultValues,
+    defaultValues: {
+      activity: "",
+      metric: 0,
+      date: new Date(),
+    },
   });
 
-  const onSubmit = (data: { activity: string; metric: string; date: Date }) => {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+  const [open, setOpen] = React.useState(false);
+
+  const onSubmit = async (data: {
+    activity: string;
+    metric: number;
+    date: Date;
+  }) => {
+    try {
+      await createActivityEntry({
+        activityId: data.activity,
+        metric: data.metric,
+        date: data.date,
+      });
+
+      toast({
+        title: "You submitted the following values:",
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
+      });
+
+      setOpen(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        return toast({
+          title: "Something went wrong",
+          description: error.message,
+        });
+      }
+    }
   };
 
+  const selectedActivityId = form.watch("activity");
+
+  const metrics = useMemo(() => {
+    const selectedActivity = activities.find(
+      (activity) => activity.id === selectedActivityId
+    );
+
+    return selectedActivity?.items || [];
+  }, [selectedActivityId, activities]);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus />
@@ -97,11 +133,11 @@ export default function DataEntryForm() {
                       <SelectContent>
                         {activities.map((activity) => (
                           <SelectItem
-                            key={activity}
-                            value={activity}
+                            key={activity.id}
+                            value={activity.id}
                             className="capitalize"
                           >
-                            {activity}
+                            {activity.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -122,17 +158,18 @@ export default function DataEntryForm() {
                   <FormLabel>Metrics</FormLabel>
                   <FormControl>
                     <Select
-                      value={field.value}
+                      value={field.value.toString()}
                       onValueChange={(value) => field.onChange(value)}
+                      disabled={!selectedActivityId}
                     >
                       <SelectTrigger className="capitalize">
                         <SelectValue placeholder="Select a metric" />
                       </SelectTrigger>
                       <SelectContent>
-                        {metrics.map((metric) => (
+                        {metrics.map((metric, index) => (
                           <SelectItem
                             key={metric}
-                            value={metric}
+                            value={`${index + 1}`}
                             className="capitalize"
                           >
                             {metric}

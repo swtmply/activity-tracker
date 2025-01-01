@@ -5,23 +5,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getActivities } from "@/lib/actions/activity.actions";
-import { auth } from "@/lib/auth";
+import { Activity } from "@/lib/db/schema/activity.schema";
 import { cn, generateRandomData, getColor } from "@/lib/utils";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
-export default async function ActivityCards() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const activities = await getActivities(session.user.id);
-
+export default async function ActivityCards({
+  activities,
+}: {
+  activities: Activity[];
+}) {
   return (
     <div className="grid grid-cols-3 gap-1">
       {activities.map((activity, index) => (
