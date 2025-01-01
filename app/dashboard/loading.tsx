@@ -1,6 +1,4 @@
-import ActivityCards from "@/components/activity-cards";
 import ActivityForm from "@/components/activity-form";
-import ActivityEntryForm from "@/components/activity-entry-form";
 import { SidebarLeft } from "@/components/sidebar-left";
 import {
   Breadcrumb,
@@ -15,35 +13,12 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { getActivities } from "@/lib/actions/activity.actions";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import DateFilter from "@/components/date-filter";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Plus } from "lucide-react";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | undefined }>;
-}) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const { m, y } = await searchParams;
-
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
-
-  const activities = await getActivities(session.user.id, {
-    month: parseInt(m || currentMonth.toString()),
-    year: parseInt(y || currentYear.toString()),
-  });
-
+export default async function Loading() {
   return (
     <SidebarProvider>
       <SidebarLeft />
@@ -68,15 +43,29 @@ export default async function Page({
           <div className="mx-auto w-full max-w-3xl flex justify-between items-center py-1">
             <div className="flex gap-4 items-center">
               <h1 className="font-bold text-2xl">Activities</h1>
-              <DateFilter month={m} year={y} />
+              <DateFilter month="0" year="0" />
             </div>
 
             <div className="flex gap-1">
               <ActivityForm />
-              <ActivityEntryForm activities={activities} />
+              <Button>
+                <Plus />
+                Add Data Entry
+              </Button>
             </div>
           </div>
-          <ActivityCards activities={activities} />
+
+          <div className="grid grid-cols-3 gap-1">
+            <Skeleton className="w-full h-64" />
+            <Skeleton />
+            <Skeleton />
+            <Skeleton className="w-full h-64" />
+            <Skeleton />
+            <Skeleton />
+            <Skeleton className="w-full h-64" />
+            <Skeleton />
+            <Skeleton />
+          </div>
         </main>
       </SidebarInset>
     </SidebarProvider>
