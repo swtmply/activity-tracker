@@ -26,8 +26,8 @@ export default function DateFilter({
   month: string | undefined;
   year: string | undefined;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
