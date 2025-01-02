@@ -3,10 +3,12 @@ import { user } from "./auth.schema";
 import { relations, sql } from "drizzle-orm";
 import { createSelectSchema, createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import cuid from "cuid";
+import { createId } from "@paralleldrive/cuid2";
 
 export const activity = sqliteTable("activity", {
-  id: text("id").primaryKey().default(cuid()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
   userId: text("user_id")
     .notNull()
     .references(() => user.id),
@@ -41,7 +43,9 @@ export const activityRelations = relations(activity, ({ one, many }) => ({
 }));
 
 export const activityEntry = sqliteTable("activity_entry", {
-  id: text("id").primaryKey().default(cuid()),
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
   activityId: text("activity_id")
     .notNull()
     .references(() => activity.id),
