@@ -27,9 +27,9 @@ export default async function ActivityPage({
   const activity = await getActivity(id);
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex flex-col gap-4">
-      <div className="mx-auto w-full max-w-3xl flex justify-between items-center py-1">
-        <div className="flex gap-4 items-center">
+    <main className="w-full flex flex-col items-center gap-4">
+      <div className="w-full max-w-3xl flex flex-col md:flex-row md:justify-between md:items-center gap-2 px-6 md:px-0 py-1">
+        <div className="flex  gap-4 items-center">
           <h1 className="font-bold text-2xl">{activity.name}</h1>
           <DateFilter month={m} year={y} showMonthButton={false} />
         </div>

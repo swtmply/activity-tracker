@@ -31,9 +31,9 @@ export default async function Page({
   });
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex flex-col gap-4">
-      <div className="mx-auto w-full max-w-3xl flex justify-between items-center py-1">
-        <div className="flex gap-4 items-center">
+    <main className="w-full flex flex-col items-center gap-4">
+      <div className="w-full max-w-sm md:max-w-3xl flex md:flex-row flex-col md:justify-between md:items-center py-1 gap-2">
+        <div className="flex flex-col md:flex-row gap-2 md:gap-4 md:items-center">
           <h1 className="font-bold text-2xl">Activities</h1>
           <DateFilter month={m} year={y} />
         </div>

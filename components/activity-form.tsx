@@ -187,7 +187,7 @@ export default function ActivityForm({
               {field.value.map((item, index) => (
                 <div
                   key={index}
-                  className="flex items-center max-w-[10vw] justify-between"
+                  className="flex items-center md:max-w-[10vw] justify-between"
                 >
                   <div className="flex gap-2 items-center">
                     <div

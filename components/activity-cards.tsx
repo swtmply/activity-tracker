@@ -21,7 +21,12 @@ export default function ActivityCards({
   ).getDate();
 
   return (
-    <div className="grid grid-cols-3 gap-1">
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-4 w-full px-6 pb-16",
+        "md:grid-cols-3 md:gap-2 md:px-0 md:max-w-3xl md:w-full"
+      )}
+    >
       {activities.map((activity, index) => {
         const fills = generateData(days);
         const data = fills.map((_, index) => {
@@ -73,7 +78,7 @@ export function ActivityCard({
               <div
                 key={index}
                 className={cn(
-                  "flex justify-center items-center h-6 w-6 rounded-lg bg-primary/10",
+                  "flex justify-center items-center size-10 md:size-6 rounded-lg bg-primary/10",
                   getColor(color, data[index] || 0)
                 )}
               />

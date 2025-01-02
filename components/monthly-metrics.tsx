@@ -14,7 +14,12 @@ export default function MonthlyMetrics({
   const currentYear = parseInt(year);
 
   return (
-    <div className="grid grid-cols-3 gap-4 pb-16 mx-auto w-full max-w-3xl">
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-4 w-full px-6 pb-16",
+        "md:grid-cols-3 md:gap-2 md:px-0 md:max-w-3xl md:w-full"
+      )}
+    >
       {months.map((month) => {
         const data = generateData(month.days);
 
@@ -31,12 +36,12 @@ export default function MonthlyMetrics({
               <CardTitle>{month.label}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-1">
+              <div className="grid grid-cols-7 gap-1">
                 {data.map((value, index) => (
                   <div
                     key={index}
                     className={cn(
-                      "w-6 h-6 rounded-lg text-[10px] flex items-center justify-center",
+                      "size-10 md:size-6 rounded-lg text-[10px] flex items-center justify-center",
                       getColor(activity.color, value)
                     )}
                   />
