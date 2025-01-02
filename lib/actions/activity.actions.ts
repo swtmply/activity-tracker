@@ -85,3 +85,35 @@ export async function getActivities(
     throw Error(`Error getting activities: ${error}`);
   }
 }
+
+export async function getActivity(id: string): Promise<ActivityWithEntries> {
+  try {
+    const response = (await db.query.activity.findFirst({
+      where: eq(activity.id, id),
+      with: {
+        entries: true,
+      },
+    })) as ActivityWithEntries;
+
+    if (!response) {
+      throw Error("Activity not found");
+    }
+
+    const entries = response.entries.map((entry) => {
+      return {
+        ...entry,
+        year: entry.date.getFullYear(),
+        month: entry.date.getMonth(),
+        day: entry.date.getDate() - 1,
+        metric: entry.metric,
+      };
+    });
+
+    return {
+      ...response,
+      entries,
+    };
+  } catch (error) {
+    throw Error(`Error getting activity: ${error}`);
+  }
+}

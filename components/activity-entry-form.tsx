@@ -42,7 +42,7 @@ export default function ActivityEntryForm({
   const form = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
-      activity: "",
+      activity: activities[0].id,
       metric: 0,
       date: new Date(),
     },

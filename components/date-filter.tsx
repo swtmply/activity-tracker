@@ -22,15 +22,17 @@ function generateYears() {
 export default function DateFilter({
   month,
   year,
+  showMonthButton = true,
 }: {
   month: string | undefined;
   year: string | undefined;
+  showMonthButton?: boolean;
 }) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
+  const currentMonth = month || new Date().getMonth().toString();
+  const currentYear = year || new Date().getFullYear().toString();
 
   const onMonthSelect = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -48,25 +50,21 @@ export default function DateFilter({
 
   return (
     <div className="flex gap-1 items-center">
-      <Select
-        defaultValue={month || currentMonth.toString()}
-        onValueChange={onMonthSelect}
-      >
-        <SelectTrigger className="w-32">
-          <SelectValue placeholder="Select a month" />
-        </SelectTrigger>
-        <SelectContent>
-          {months.map((month) => (
-            <SelectItem key={month.value} value={month.value.toString()}>
-              {month.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select
-        defaultValue={year || currentYear.toString()}
-        onValueChange={onYearSelect}
-      >
+      {showMonthButton && (
+        <Select defaultValue={currentMonth} onValueChange={onMonthSelect}>
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Select a month" />
+          </SelectTrigger>
+          <SelectContent>
+            {months.map((month) => (
+              <SelectItem key={month.value} value={month.value.toString()}>
+                {month.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+      <Select defaultValue={currentYear} onValueChange={onYearSelect}>
         <SelectTrigger className="w-32">
           <SelectValue placeholder="Select a month" />
         </SelectTrigger>

@@ -13,13 +13,13 @@ export default async function Loading() {
       </div>
 
       <div className="grid grid-cols-3 gap-1">
-        <Skeleton className="w-full h-64" />
+        <Skeleton className="w-full h-56" />
         <Skeleton />
         <Skeleton />
-        <Skeleton className="w-full h-64" />
+        <Skeleton className="w-full h-56" />
         <Skeleton />
         <Skeleton />
-        <Skeleton className="w-full h-64" />
+        <Skeleton className="w-full h-56" />
         <Skeleton />
         <Skeleton />
       </div>

@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActivityWithEntries } from "@/lib/db/schema/activity.schema";
-import { cn, generateData, getColor, months } from "@/lib/utils";
+import { cn, generateData, getColor } from "@/lib/utils";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 export default function ActivityCards({
@@ -38,6 +33,7 @@ export default function ActivityCards({
         return (
           <ActivityCard
             key={index}
+            id={activity.id}
             name={activity.name}
             data={data}
             color={activity.color}
@@ -52,38 +48,39 @@ export function ActivityCard({
   name,
   data,
   color,
+  id,
 }: {
   name: string;
   data: number[];
   color: string;
+  id: string;
 }) {
   const searchParams = useSearchParams();
-  const m = searchParams.get("m");
-  const currentMonth = months.find(
-    (month) => month.value === parseInt(m || new Date().getMonth().toString())
-  )?.label;
+  const y = searchParams.get("y");
+
+  const params = new URLSearchParams(searchParams.toString());
+  params.set("y", y || new Date().getFullYear().toString());
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>
-          <span className="capitalize">{currentMonth} Summary</span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-7 gap-1">
-          {data.map((_, index) => (
-            <div
-              key={index}
-              className={cn(
-                "flex justify-center items-center h-6 w-6 rounded-lg bg-primary/10",
-                getColor(color, data[index] || 0)
-              )}
-            />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <Link href={`/dashboard/activity/${id}?${params.toString()}`} prefetch>
+      <Card>
+        <CardHeader>
+          <CardTitle>{name}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-7 gap-1">
+            {data.map((_, index) => (
+              <div
+                key={index}
+                className={cn(
+                  "flex justify-center items-center h-6 w-6 rounded-lg bg-primary/10",
+                  getColor(color, data[index] || 0)
+                )}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
