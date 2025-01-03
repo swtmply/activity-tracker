@@ -1,3 +1,4 @@
+import SignOutButton from "@/components/sign-out-button";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,7 +18,7 @@ export default function DashboardLayout({
       <SidebarLeft />
       <SidebarInset> */}
       <header className="sticky top-0 flex h-14 shrink-0 items-center justify-center gap-2 bg-background">
-        <div className="flex flex-1 items-center gap-2 max-w-3xl pl-6 md:pl-0">
+        <div className="flex flex-1 items-center justify-between gap-2 max-w-3xl pl-6 md:pl-0">
           {/* <SidebarTrigger />
           <Separator orientation="vertical" className="mr-2 h-4" /> */}
           <Breadcrumb>
@@ -29,6 +30,8 @@ export default function DashboardLayout({
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+
+          <SignOutButton />
         </div>
       </header>
       {children}
