@@ -2,8 +2,8 @@ import SignOutButton from "@/components/sign-out-button";
 import {
   Breadcrumb,
   BreadcrumbItem,
+  BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import React from "react";
 
@@ -13,20 +13,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      {/* <SidebarProvider>
-      <SidebarLeft />
-      <SidebarInset> */}
+    <React.Fragment>
       <header className="sticky top-0 flex h-14 shrink-0 items-center justify-center gap-2 bg-background">
         <div className="flex flex-1 items-center justify-between gap-2 max-w-3xl pl-6 md:pl-0">
-          {/* <SidebarTrigger />
-          <Separator orientation="vertical" className="mr-2 h-4" /> */}
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <BreadcrumbPage className="line-clamp-1">
-                  Activity Tracking
-                </BreadcrumbPage>
+                <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -35,8 +28,6 @@ export default function DashboardLayout({
         </div>
       </header>
       {children}
-      {/* </SidebarInset>
-    </SidebarProvider> */}
-    </>
+    </React.Fragment>
   );
 }
