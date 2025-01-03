@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq, gte, lte } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { db } from "../db";
 import {
   Activity,
@@ -9,7 +10,7 @@ import {
   ActivityInsert,
   ActivityWithEntries,
 } from "../db/schema/activity.schema";
-import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export const createActivity = async (data: ActivityInsert) => {
   try {
@@ -117,3 +118,25 @@ export async function getActivity(id: string): Promise<ActivityWithEntries> {
     throw Error(`Error getting activity: ${error}`);
   }
 }
+
+export const editActivity = async (data: Activity) => {
+  try {
+    await db.update(activity).set(data).where(eq(activity.id, data.id));
+
+    revalidatePath("/dashboard");
+  } catch (error) {
+    throw Error(`Error editing activity: ${error}`);
+  }
+};
+
+export const deleteActivity = async (id: string) => {
+  try {
+    await db.delete(activity).where(eq(activity.id, id));
+
+    revalidatePath("/dashboard");
+  } catch (error) {
+    throw Error(`Error deleting activity: ${error}`);
+  }
+
+  redirect("/dashboard");
+};

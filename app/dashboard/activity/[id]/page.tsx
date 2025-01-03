@@ -1,10 +1,10 @@
 import DateFilter from "@/components/date-filter";
+import MonthlyMetrics from "@/components/monthly-metrics";
 import { getActivity } from "@/lib/actions/activity.actions";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import EntryFormDialog from "./_components/entry-form-dialog";
-import MonthlyMetrics from "@/components/monthly-metrics";
+import ActivityEntryActionsDialog from "./_components/activity-entry-actions-dialog";
 
 export default async function ActivityPage({
   params,
@@ -33,7 +33,7 @@ export default async function ActivityPage({
           <h1 className="font-bold text-2xl">{activity.name}</h1>
           <DateFilter month={m} year={y} showMonthButton={false} />
         </div>
-        <EntryFormDialog activity={activity} />
+        <ActivityEntryActionsDialog activity={activity} />
       </div>
 
       <MonthlyMetrics activity={activity} year={y} />

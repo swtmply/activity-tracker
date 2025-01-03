@@ -11,7 +11,7 @@ export const activity = sqliteTable("activity", {
     .$defaultFn(() => createId()),
   userId: text("user_id")
     .notNull()
-    .references(() => user.id),
+    .references(() => user.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   items: text("items", { mode: "json" }).notNull(),
   color: text("color").notNull(),
@@ -48,7 +48,7 @@ export const activityEntry = sqliteTable("activity_entry", {
     .$defaultFn(() => createId()),
   activityId: text("activity_id")
     .notNull()
-    .references(() => activity.id),
+    .references(() => activity.id, { onDelete: "cascade" }),
   metric: integer("metric").notNull(),
   date: integer("date", { mode: "timestamp" }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })

@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 
 const schema = z.object({
   activity: z.string().min(1, { message: "Activity is required" }),
@@ -91,137 +92,146 @@ export default function ActivityEntryForm({
   }, [selectedActivityId, activities]);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <Controller
-          name="activity"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <FormItem>
-              <FormLabel>Activity</FormLabel>
-              <FormControl>
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => field.onChange(value)}
-                >
-                  <SelectTrigger className="capitalize">
-                    <SelectValue placeholder="Select an activity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {activities.map((activity) => (
-                      <SelectItem
-                        key={activity.id}
-                        value={activity.id}
-                        className="capitalize"
-                      >
-                        {activity.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              {fieldState.error && (
-                <FormMessage>{fieldState.error.message}</FormMessage>
-              )}
-            </FormItem>
-          )}
-        />
+    <React.Fragment>
+      <DialogHeader>
+        <DialogTitle>Create Activity Entry</DialogTitle>
+        <DialogDescription></DialogDescription>
+      </DialogHeader>
 
-        <Controller
-          name="metric"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <FormItem>
-              <FormLabel>Metrics</FormLabel>
-              <FormControl>
-                <Select
-                  value={field.value.toString()}
-                  onValueChange={(value) => field.onChange(value)}
-                  disabled={!selectedActivityId}
-                >
-                  <SelectTrigger className="capitalize">
-                    <SelectValue placeholder="Select a metric" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {metrics.map((metric, index) => (
-                      <SelectItem
-                        key={metric}
-                        value={`${index + 1}`}
-                        className="capitalize"
-                      >
-                        {metric}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              {fieldState.error && (
-                <FormMessage>{fieldState.error.message}</FormMessage>
-              )}
-            </FormItem>
-          )}
-        />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Controller
+            name="activity"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>Activity</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => field.onChange(value)}
+                  >
+                    <SelectTrigger className="capitalize">
+                      <SelectValue placeholder="Select an activity" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {activities.map((activity) => (
+                        <SelectItem
+                          key={activity.id}
+                          value={activity.id}
+                          className="capitalize"
+                        >
+                          {activity.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                {fieldState.error && (
+                  <FormMessage>{fieldState.error.message}</FormMessage>
+                )}
+              </FormItem>
+            )}
+          />
 
-        <Controller
-          name="date"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <FormItem>
-              <FormLabel>Date</FormLabel>
-              <FormControl>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                      components={{
-                        Day: (props) => (
-                          <DatePickerDay asChild {...props}>
-                            <PopoverClose>{props.date.getDate()}</PopoverClose>
-                          </DatePickerDay>
-                        ),
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </FormControl>
-              {fieldState.error && (
-                <FormMessage>{fieldState.error.message}</FormMessage>
-              )}
-            </FormItem>
-          )}
-        />
+          <Controller
+            name="metric"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>Metrics</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value.toString()}
+                    onValueChange={(value) => field.onChange(value)}
+                    disabled={!selectedActivityId}
+                  >
+                    <SelectTrigger className="capitalize">
+                      <SelectValue placeholder="Select a metric" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {metrics.map((metric, index) => (
+                        <SelectItem
+                          key={metric}
+                          value={`${index + 1}`}
+                          className="capitalize"
+                        >
+                          {metric}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                {fieldState.error && (
+                  <FormMessage>{fieldState.error.message}</FormMessage>
+                )}
+              </FormItem>
+            )}
+          />
 
-        <div className="grid grid-cols-2 gap-2">
-          <Button onClick={closeDialog} type="button" variant={"secondary"}>
-            Cancel
-          </Button>
-          <Button type="submit">Submit</Button>
-        </div>
-      </form>
-    </Form>
+          <Controller
+            name="date"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
+                <FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                        components={{
+                          Day: (props) => (
+                            <DatePickerDay asChild {...props}>
+                              <PopoverClose>
+                                {props.date.getDate()}
+                              </PopoverClose>
+                            </DatePickerDay>
+                          ),
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </FormControl>
+                {fieldState.error && (
+                  <FormMessage>{fieldState.error.message}</FormMessage>
+                )}
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-2 gap-2">
+            <Button onClick={closeDialog} type="button" variant={"secondary"}>
+              Cancel
+            </Button>
+            <Button type="submit">Submit</Button>
+          </div>
+        </form>
+      </Form>
+    </React.Fragment>
   );
 }

@@ -11,15 +11,21 @@ import {
 } from "@/components/ui/select";
 
 import { toast } from "@/hooks/use-toast";
-import { createActivity } from "@/lib/actions/activity.actions";
+import { createActivity, editActivity } from "@/lib/actions/activity.actions";
 import { authClient } from "@/lib/auth-client";
-import { activityInsertSchema } from "@/lib/db/schema/activity.schema";
+import {
+  Activity,
+  activityInsertSchema,
+} from "@/lib/db/schema/activity.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "./ui/button";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
+import { DialogDescription } from "./ui/dialog";
+import { DialogTitle } from "./ui/dialog";
+import { DialogHeader } from "./ui/dialog";
 
 const tailwindColors = [
   "red",
@@ -36,19 +42,33 @@ const defaultValues = {
   color: tailwindColors[0],
   items: [] as string[],
 };
-export default function ActivityForm({
-  closeDialog,
-}: {
+
+type ActivityFormBaseProps = {
   closeDialog: () => void;
-}) {
+};
+
+interface ActivityFormEditProps extends ActivityFormBaseProps {
+  edit: true;
+  activity: Activity;
+}
+
+interface ActivityFormInsertProps extends ActivityFormBaseProps {
+  edit?: false;
+}
+
+type ActivityFormProps = ActivityFormInsertProps | ActivityFormEditProps;
+
+export default function ActivityForm(props: ActivityFormProps) {
   const { data: session } = authClient.useSession();
 
   const form = useForm({
     resolver: zodResolver(activityInsertSchema),
-    defaultValues: {
-      ...defaultValues,
-      userId: "user_id_placeholder",
-    },
+    defaultValues: props.edit
+      ? props.activity
+      : {
+          ...defaultValues,
+          userId: "user_id_placeholder",
+        },
   });
   const [newItem, setNewItem] = React.useState("");
 
@@ -83,10 +103,17 @@ export default function ActivityForm({
     }
 
     try {
-      await createActivity({
-        ...data,
-        userId: session.user.id,
-      });
+      if (props.edit) {
+        await editActivity({
+          ...props.activity,
+          ...data,
+        });
+      } else {
+        await createActivity({
+          ...data,
+          userId: session.user.id,
+        });
+      }
 
       toast({
         title: "You submitted the following values:",
@@ -97,7 +124,7 @@ export default function ActivityForm({
         ),
       });
 
-      closeDialog();
+      props.closeDialog();
     } catch (error: unknown) {
       if (error instanceof Error) {
         return toast({
@@ -109,114 +136,127 @@ export default function ActivityForm({
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <Controller
-          name="name"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter name" {...field} />
-              </FormControl>
-              {fieldState.error && (
-                <FormMessage>{fieldState.error.message}</FormMessage>
-              )}
-            </FormItem>
-          )}
-        />
+    <React.Fragment>
+      <DialogHeader>
+        <DialogTitle>
+          {props.edit ? "Edit" : "Create"} Activity Form
+        </DialogTitle>
+        <DialogDescription></DialogDescription>
+      </DialogHeader>
 
-        <div className="flex flex-col gap-4">
-          <FormLabel>Metrics</FormLabel>
-          <div className="grid grid-cols-2 gap-2">
-            <Input
-              placeholder="Enter metric (max 5 items)"
-              value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Controller
+            name="name"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter name" {...field} />
+                </FormControl>
+                {fieldState.error && (
+                  <FormMessage>{fieldState.error.message}</FormMessage>
+                )}
+              </FormItem>
+            )}
+          />
 
-            <Controller
-              name="color"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <FormItem>
-                  <FormControl>
-                    <Select
-                      value={field.value}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                      }}
-                    >
-                      <SelectTrigger className="capitalize">
-                        <SelectValue placeholder="Select a color" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {tailwindColors.map((color) => (
-                          <SelectItem
-                            key={color}
-                            value={color}
-                            className="capitalize"
-                            withColor
-                          >
-                            {color}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  {fieldState.error && (
-                    <FormMessage>{fieldState.error.message}</FormMessage>
-                  )}
-                </FormItem>
-              )}
-            />
+          <div className="flex flex-col gap-4">
+            <FormLabel>Metrics</FormLabel>
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                placeholder="Enter metric (max 5 items)"
+                value={newItem}
+                onChange={(e) => setNewItem(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+
+              <Controller
+                name="color"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                        }}
+                      >
+                        <SelectTrigger className="capitalize">
+                          <SelectValue placeholder="Select a color" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {tailwindColors.map((color) => (
+                            <SelectItem
+                              key={color}
+                              value={color}
+                              className="capitalize"
+                              withColor
+                            >
+                              {color}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    {fieldState.error && (
+                      <FormMessage>{fieldState.error.message}</FormMessage>
+                    )}
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {form.formState.errors && (
+              <FormMessage>{form.formState.errors.items?.message}</FormMessage>
+            )}
           </div>
 
-          {form.formState.errors && (
-            <FormMessage>{form.formState.errors.items?.message}</FormMessage>
-          )}
-        </div>
-
-        <Controller
-          name="items"
-          control={form.control}
-          render={({ field }) => (
-            <div className="grid grid-cols-2 gap-4">
-              {field.value.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex items-center md:max-w-[10vw] justify-between"
-                >
-                  <div className="flex gap-2 items-center">
-                    <div
-                      className={`w-4 h-4 bg-${selectedColor}-${
-                        (index + 1) * 100
-                      } mr-2 rounded-lg`}
-                    ></div>
-                    <span className="line-clamp-1 text-sm">{item}</span>
-                  </div>
-                  <Button
-                    onClick={() => removeItem(index)}
-                    variant={"secondary"}
-                    size={"icon"}
-                    className="hover:text-red-500 hover:bg-red-100 rounded-full"
+          <Controller
+            name="items"
+            control={form.control}
+            render={({ field }) => (
+              <div className="grid grid-cols-2 gap-4">
+                {field.value.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center md:max-w-[10vw] justify-between"
                   >
-                    <Trash />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        />
-        <div className="grid grid-cols-2 gap-2">
-          <Button onClick={closeDialog} type="button" variant={"secondary"}>
-            Cancel
-          </Button>
-          <Button type="submit">Submit</Button>
-        </div>
-      </form>
-    </Form>
+                    <div className="flex gap-2 items-center">
+                      <div
+                        className={`w-4 h-4 bg-${selectedColor}-${
+                          (index + 1) * 100
+                        } mr-2 rounded-lg`}
+                      ></div>
+                      <span className="line-clamp-1 text-sm">{item}</span>
+                    </div>
+                    <Button
+                      onClick={() => removeItem(index)}
+                      variant={"secondary"}
+                      size={"icon"}
+                      className="hover:text-red-500 hover:bg-red-100 rounded-full"
+                    >
+                      <Trash />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={props.closeDialog}
+              type="button"
+              variant={"secondary"}
+            >
+              Cancel
+            </Button>
+            <Button type="submit">Submit</Button>
+          </div>
+        </form>
+      </Form>
+    </React.Fragment>
   );
 }

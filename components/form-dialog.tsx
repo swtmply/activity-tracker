@@ -1,17 +1,12 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Activity } from "@/lib/db/schema/activity.schema";
 import { BetweenHorizonalStart, Plus } from "lucide-react";
 import React from "react";
 import ActivityEntryForm from "./activity-entry-form";
 import ActivityForm from "./activity-form";
 import { Button } from "./ui/button";
-import { DialogHeader } from "./ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Activity } from "@/lib/db/schema/activity.schema";
 
 export default function FormDialog({ activities }: { activities: Activity[] }) {
   const [openDialog, setOpenDialog] = React.useState(false);
@@ -59,13 +53,6 @@ export default function FormDialog({ activities }: { activities: Activity[] }) {
         </DropdownMenuContent>
       </DropdownMenu>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Confirmation</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to proceed with this action?
-          </DialogDescription>
-        </DialogHeader>
-
         {form === "activity" ? (
           <ActivityForm closeDialog={() => setOpenDialog(false)} />
         ) : (
