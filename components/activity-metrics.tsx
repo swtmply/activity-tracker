@@ -17,7 +17,7 @@ export default function ActivityMetrics({
   const firstDayOfMonth = new Date(currentYear, 0, 1).getDay();
 
   return (
-    <div className="grid gap-2 w-full max-w-5xl">
+    <div className="grid gap-2 w-full lg:max-w-5xl max-w-sm overflow-x-scroll lg:overflow-x-auto">
       <div className="grid grid-flow-col">
         <div />
         {months.map((month) => (

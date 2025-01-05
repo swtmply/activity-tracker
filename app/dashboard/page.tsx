@@ -1,6 +1,6 @@
 import ActivityMetrics from "@/components/activity-metrics";
 
-import DateFilter from "@/components/date-filter";
+import YearSelect from "@/components/year-select";
 import FormDialog from "@/components/form-dialog";
 import { getActivities } from "@/lib/actions/activity.actions";
 import { auth } from "@/lib/auth";
@@ -32,9 +32,9 @@ export default async function Page({
   return (
     <main className="w-full flex flex-col items-center gap-4">
       <div className="w-full max-w-sm md:max-w-5xl flex md:flex-row flex-col md:justify-between md:items-center py-1 gap-2">
-        <div className="flex flex-col md:flex-row gap-2 md:gap-4 md:items-center">
+        <div className="flex gap-4 items-center">
           <h1 className="font-bold text-2xl">Activities in</h1>
-          <DateFilter month={m} year={y} />
+          <YearSelect month={m} year={y} />
         </div>
 
         <FormDialog activities={activities} />
@@ -44,10 +44,12 @@ export default async function Page({
         <Link
           href={`/dashboard/activity/${activity.id}?y=${y || currentYear}`}
           passHref
-          className="flex flex-col gap-2 last:pb-16 max-w-5xl w-full"
+          className="flex flex-col gap-2 last:pb-16 max-w-5xl w-full items-center"
           key={activity.id}
         >
-          <h1 className="text-2xl font-bold">{activity.name}</h1>
+          <h1 className="text-2xl font-bold max-w-sm w-full lg:max-w-5xl">
+            {activity.name}
+          </h1>
           <ActivityMetrics activity={activity} year={y} />
         </Link>
       ))}

@@ -18,7 +18,7 @@ function generateYears() {
   return years;
 }
 
-export default function DateFilter({
+export default function YearSelect({
   year,
 }: {
   month: string | undefined;
