@@ -1,5 +1,5 @@
 import DateFilter from "@/components/date-filter";
-import MonthlyMetrics from "@/components/monthly-metrics";
+import ActivityMetrics from "@/components/activity-metrics";
 import { getActivity } from "@/lib/actions/activity.actions";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
@@ -28,7 +28,7 @@ export default async function ActivityPage({
 
   return (
     <main className="w-full flex flex-col items-center gap-4">
-      <div className="w-full max-w-3xl flex flex-col md:flex-row md:justify-between md:items-center gap-2 px-6 md:px-0 py-1">
+      <div className="w-full max-w-5xl flex flex-col md:flex-row md:justify-between md:items-center gap-2 px-6 md:px-0 py-1">
         <div className="flex  gap-4 items-center">
           <h1 className="font-bold text-2xl">{activity.name}</h1>
           <DateFilter month={m} year={y} showMonthButton={false} />
@@ -36,7 +36,7 @@ export default async function ActivityPage({
         <ActivityEntryActionsDialog activity={activity} />
       </div>
 
-      <MonthlyMetrics activity={activity} year={y} />
+      <ActivityMetrics activity={activity} year={y} />
     </main>
   );
 }

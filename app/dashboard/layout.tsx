@@ -15,7 +15,7 @@ export default function DashboardLayout({
   return (
     <React.Fragment>
       <header className="sticky top-0 flex h-14 shrink-0 items-center justify-center gap-2 bg-background">
-        <div className="flex flex-1 items-center justify-between gap-2 max-w-3xl pl-6 md:pl-0">
+        <div className="flex flex-1 items-center justify-between gap-2 max-w-5xl pl-6 md:pl-0">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>

@@ -1,10 +1,11 @@
-import ActivityCards from "@/components/activity-cards";
+import ActivityMetrics from "@/components/activity-metrics";
 
 import DateFilter from "@/components/date-filter";
 import FormDialog from "@/components/form-dialog";
 import { getActivities } from "@/lib/actions/activity.actions";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function Page({
@@ -22,25 +23,34 @@ export default async function Page({
 
   const { m, y } = await searchParams;
 
-  const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
 
   const activities = await getActivities(session.user.id, {
-    month: parseInt(m || currentMonth.toString()),
     year: parseInt(y || currentYear.toString()),
   });
 
   return (
     <main className="w-full flex flex-col items-center gap-4">
-      <div className="w-full max-w-sm md:max-w-3xl flex md:flex-row flex-col md:justify-between md:items-center py-1 gap-2">
+      <div className="w-full max-w-sm md:max-w-5xl flex md:flex-row flex-col md:justify-between md:items-center py-1 gap-2">
         <div className="flex flex-col md:flex-row gap-2 md:gap-4 md:items-center">
-          <h1 className="font-bold text-2xl">Activities</h1>
+          <h1 className="font-bold text-2xl">Activities in</h1>
           <DateFilter month={m} year={y} />
         </div>
 
         <FormDialog activities={activities} />
       </div>
-      <ActivityCards activities={activities} />
+
+      {activities.map((activity) => (
+        <Link
+          href={`/dashboard/activity/${activity.id}?y=${y || currentYear}`}
+          passHref
+          className="flex flex-col gap-2 last:pb-16 max-w-5xl w-full"
+          key={activity.id}
+        >
+          <h1 className="text-2xl font-bold">{activity.name}</h1>
+          <ActivityMetrics activity={activity} year={y} />
+        </Link>
+      ))}
     </main>
   );
 }

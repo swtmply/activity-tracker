@@ -23,7 +23,6 @@ export const createActivity = async (data: ActivityInsert) => {
 };
 
 type GetActivitiesOptions = {
-  month: number;
   year: number;
 };
 
@@ -43,8 +42,8 @@ export async function getActivities(
 ): Promise<Activity[] | ActivityWithEntries[]> {
   try {
     if (options) {
-      const startDate = new Date(options.year, options.month, 1);
-      const endDate = new Date(options.year, options.month + 1, 0);
+      const startDate = new Date(options.year, 0, 1);
+      const endDate = new Date(options.year, 11, 31);
 
       const response = (await db.query.activity.findMany({
         where: and(eq(activity.userId, userId)),
