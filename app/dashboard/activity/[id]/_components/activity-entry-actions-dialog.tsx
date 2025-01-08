@@ -70,6 +70,10 @@ export default function ActivityEntryActionsDialog({
       />
     );
 
+  const response = fetch("/api/activities");
+
+  console.log(response);
+
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <DropdownMenu>

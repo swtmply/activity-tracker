@@ -22,9 +22,11 @@ export const createActivity = async (data: ActivityInsert) => {
   }
 };
 
-type GetActivitiesOptions = {
-  year: number;
-};
+type GetActivitiesOptions =
+  | {
+      year: number;
+    }
+  | undefined;
 
 export function getActivities(
   userId: string,
